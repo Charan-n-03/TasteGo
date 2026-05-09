@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if coupon else 'Add' }} Coupon{% endblock %}
+{% block content %}
+<a href="{{ url_for('admin.coupons') }}" class="btn btn-ghost mb-3"><i class="fa-solid fa-arrow-left"></i> Back</a>
+<div class="form-card" style="max-width:500px">
+    <h2>{{ 'Edit' if coupon else 'Create' }} Coupon</h2>
+    <form action="{{ url_for('admin.edit_coupon', c_id=coupon.id) if coupon else url_for('admin.add_coupon') }}" method="POST">
+        <div class="form-group"><label>Code</label><input type="text" name="code" value="{{ coupon.code if coupon else '' }}" style="text-transform:uppercase" required></div>
+        <div class="form-group"><label>Description</label><input type="text" name="description" value="{{ coupon.description if coupon else '' }}" placeholder="e.g. 50% off on first order"></div>
+        <div class="grid-2">
+            <div class="form-group"><label>Discount %</label><input type="number" name="discount_percent" value="{{ coupon.discount_percent if coupon else 10 }}" required></div>
+            <div class="form-group"><label>Max Discount (₹)</label><input type="number" name="max_discount" value="{{ coupon.max_discount if coupon else 100 }}" required></div>
+        </div>
+        <div class="grid-2">
+            <div class="form-group"><label>Min Order (₹)</label><input type="number" name="min_order" value="{{ coupon.min_order if coupon else 200 }}" required></div>
+            <div class="form-group"><label>Status</label><select name="is_active"><option value="1" {{ 'selected' if not coupon or coupon.is_active }}>Active</option><option value="0" {{ 'selected' if coupon and not coupon.is_active }}>Inactive</option></select></div>
+        </div>
+        <button type="submit" class="btn" style="width:100%">{{ 'Update' if coupon else 'Create' }} Coupon</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Admin Profile{% endblock %}
+{% block content %}
+<a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost mb-3"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+
+<div class="profile-header">
+    <div class="profile-avatar">{{ user.username[0]|upper }}</div>
+    <div>
+        <h2 style="margin-bottom:4px">{{ user.username }}</h2>
+        <p class="text-muted">{{ user.email }} · <span class="nav-role-badge">ADMIN</span></p>
+    </div>
+</div>
+
+<div class="form-card" style="max-width:500px">
+    <h2><i class="fa-solid fa-user-shield"></i> Edit Profile</h2>
+    <form action="{{ url_for('admin.profile') }}" method="POST">
+        <div class="form-group">
+            <label><i class="fa-solid fa-user"></i> Username</label>
+            <input type="text" name="username" value="{{ user.username }}" required>
+        </div>
+        <div class="form-group">
+            <label><i class="fa-solid fa-envelope"></i> Email</label>
+            <input type="email" name="email" value="{{ user.email }}" required>
+        </div>
+        <div class="form-group">
+            <label><i class="fa-solid fa-phone"></i> Phone</label>
+            <input type="tel" name="phone" value="{{ user.phone or '' }}">
+        </div>
+        <div class="form-group">
+            <label><i class="fa-solid fa-lock"></i> New Password <span class="text-muted" style="font-size:12px">(leave blank to keep current)</span></label>
+            <input type="password" name="password" placeholder="Min 6 characters">
+        </div>
+        <button type="submit" class="btn" style="width:100%"><i class="fa-solid fa-save"></i> Update Profile</button>
+    </form>
+</div>
+{% endblock %}

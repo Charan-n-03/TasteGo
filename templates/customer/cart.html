@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Cart{% endblock %}
+{% block content %}
+<h2 class="section-title"><i class="fa-solid fa-bag-shopping"></i> Your Cart</h2>
+{% if cart_items %}
+<div class="grid-2" style="gap:30px;margin-top:20px;align-items:start">
+<div>
+    <p class="text-muted mb-2">From: <strong>{{ restaurant.name if restaurant else 'Restaurant' }}</strong></p>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+    {% for item in cart_items %}
+    <div class="cart-item">
+        {% if item.menu_item.image_url %}<img src="{{ item.menu_item.image_url }}" class="cart-item-img" alt="">{% endif %}
+        <div class="cart-item-info">
+            <h4>{{ item.menu_item.name }}</h4>
+            <p class="price">₹{{ "%.0f"|format(item.menu_item.price) }} each</p>
+        </div>
+        <div class="qty-control">
+            <form action="{{ url_for('customer.update_cart_quantity', item_id=item.menu_item.id) }}" method="POST" style="display:contents"><input type="hidden" name="action" value="decrement"><button type="submit">−</button></form>
+            <span>{{ item.quantity }}</span>
+            <form action="{{ url_for('customer.update_cart_quantity', item_id=item.menu_item.id) }}" method="POST" style="display:contents"><input type="hidden" name="action" value="increment"><button type="submit">+</button></form>
+        </div>
+        <strong style="min-width:70px;text-align:right">₹{{ "%.0f"|format(item.subtotal) }}</strong>
+    </div>
+    {% endfor %}
+    </div>
+    <form action="{{ url_for('customer.clear_cart') }}" method="POST" style="margin-top:12px">
+        <button type="submit" class="btn btn-ghost btn-sm"><i class="fa-solid fa-trash"></i> Clear Cart</button>
+    </form>
+</div>
+<div>
+    <!-- Coupon -->
+    <div class="bill-card mb-2">
+        <h4 style="margin-bottom:12px"><i class="fa-solid fa-tags" style="color:var(--primary)"></i> Apply Coupon</h4>
+        {% if applied_coupon %}
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--success-bg);border-radius:var(--radius-sm)">
+            <span style="font-weight:600;color:var(--success)"><i class="fa-solid fa-check-circle"></i> {{ applied_coupon }} applied</span>
+            <form action="{{ url_for('customer.remove_coupon') }}" method="POST"><button type="submit" class="btn btn-ghost btn-sm" style="color:var(--error)!important">Remove</button></form>
+        </div>
+        {% else %}
+        <form action="{{ url_for('customer.apply_coupon') }}" method="POST" class="coupon-input">
+            <input type="text" name="coupon_code" placeholder="Enter coupon code" style="text-transform:uppercase">
+            <button type="submit" class="btn btn-sm btn-outline">Apply</button>
+        </form>
+        {% if coupons %}
+        <div style="margin-top:8px">
+            {% for c in coupons[:3] %}
+            <div class="coupon-card" onclick="this.closest('.bill-card').querySelector('input[name=coupon_code]').value='{{ c.code }}'">
+                <div><div class="coupon-code">{{ c.code }}</div><div class="coupon-desc">{{ c.description or (c.discount_percent|int ~ '% off up to ₹' ~ c.max_discount|int) }}</div></div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <!-- Bill -->
+    <div class="bill-card">
+        <h4 style="margin-bottom:12px"><i class="fa-solid fa-receipt"></i> Bill Details</h4>
+        <div class="bill-row"><span>Item Total</span><span>₹{{ "%.2f"|format(total) }}</span></div>
+        <div class="bill-row"><span>Delivery Fee</span><span>{% if delivery_fee == 0 %}<span class="free">FREE</span>{% else %}₹{{ "%.2f"|format(delivery_fee) }}{% endif %}</span></div>
+        {% if discount > 0 %}<div class="bill-row"><span>Discount</span><span class="discount">-₹{{ "%.2f"|format(discount) }}</span></div>{% endif %}
+        <div class="bill-row total"><span>To Pay</span><span>₹{{ "%.2f"|format(grand_total) }}</span></div>
+    </div>
+
+    <!-- Checkout -->
+    <form action="{{ url_for('customer.checkout') }}" method="POST" style="margin-top:16px">
+        <div class="form-group">
+            <label><i class="fa-solid fa-location-dot"></i> Delivery Address</label>
+            <p style="font-size:14px;padding:10px;background:var(--surface-alt);border-radius:var(--radius-sm);border:1px solid var(--border)">{{ user.address or 'No address set — update in Profile' }}</p>
+        </div>
+        <div class="form-group">
+            <label><i class="fa-solid fa-credit-card"></i> Payment Method</label>
+            <select name="payment_method">
+                <option value="COD">💵 Cash on Delivery</option>
+                <option value="UPI">📱 UPI</option>
+                <option value="Card">💳 Credit/Debit Card</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label><i class="fa-solid fa-message"></i> Special Instructions</label>
+            <textarea name="special_instructions" rows="2" placeholder="e.g. Extra spicy, no onions..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-success" style="width:100%;padding:14px"><i class="fa-solid fa-check"></i> Place Order · ₹{{ "%.0f"|format(grand_total) }}</button>
+    </form>
+</div>
+</div>
+{% else %}
+<div class="text-center" style="padding:60px 20px">
+    <i class="fa-solid fa-bag-shopping" style="font-size:64px;color:var(--border);margin-bottom:20px;display:block"></i>
+    <h3>Your cart is empty</h3>
+    <p class="text-muted mb-3">Add items from a restaurant to get started</p>
+    <a href="{{ url_for('customer.dashboard') }}" class="btn"><i class="fa-solid fa-utensils"></i> Find Restaurants</a>
+</div>
+{% endif %}
+{% endblock %}

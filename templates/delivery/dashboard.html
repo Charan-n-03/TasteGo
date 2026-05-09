@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Delivery Dashboard{% endblock %}
+{% block content %}
+<div class="flex-between mb-3">
+    <h2 class="section-title"><i class="fa-solid fa-motorcycle"></i> Delivery Dashboard</h2>
+    <form action="{{ url_for('delivery.toggle_availability') }}" method="POST">
+        <button type="submit" class="btn {{ 'btn-success' if partner.is_available else 'btn-secondary' }}">
+            <i class="fa-solid fa-{{ 'signal' if partner.is_available else 'power-off' }}"></i>
+            {{ 'Online' if partner.is_available else 'Offline' }}
+        </button>
+    </form>
+</div>
+
+<!-- Stats -->
+<div class="dashboard-stats">
+    <div class="stat-card"><i class="fa-solid fa-box-open"></i><h3>Total Deliveries</h3><div class="stat-value">{{ total_deliveries }}</div></div>
+    <div class="stat-card"><i class="fa-solid fa-indian-rupee-sign"></i><h3>Total Earnings</h3><div class="stat-value">₹{{ "%.0f"|format(total_earnings) }}</div></div>
+    <div class="stat-card"><i class="fa-solid fa-star"></i><h3>Rating</h3><div class="stat-value">{{ "%.1f"|format(partner.rating) }}</div></div>
+    <div class="stat-card"><i class="fa-solid fa-motorcycle"></i><h3>Vehicle</h3><div class="stat-value" style="font-size:18px">{{ partner.vehicle_type }}</div></div>
+</div>
+
+<!-- Active Deliveries -->
+{% if assigned_orders %}
+<h3 class="section-title mb-2"><i class="fa-solid fa-bolt" style="color:var(--warning)"></i> Active Deliveries</h3>
+<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:30px">
+{% for order in assigned_orders %}
+<div class="card" style="border-left:4px solid var(--primary)">
+    <div class="flex-between" style="flex-wrap:wrap;gap:12px">
+        <div>
+            <h4>Order #{{ order.id }} — {{ order.restaurant.name }}</h4>
+            <p class="text-muted" style="font-size:13px"><i class="fa-solid fa-location-dot"></i> {{ order.delivery_address or order.user.address or order.user.email }}</p>
+            <p class="text-muted" style="font-size:13px"><i class="fa-solid fa-user"></i> {{ order.user.username }} · ₹{{ "%.0f"|format(order.total_amount) }}</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+            <span class="status-badge status-{{ order.status.lower().replace(' ','_').replace('for_','') }}">{{ order.status }}</span>
+            {% if order.status != 'Delivered' %}
+            <form action="{{ url_for('delivery.complete_order', order_id=order.id) }}" method="POST">
+                <button type="submit" class="btn btn-success btn-sm"><i class="fa-solid fa-check"></i> Mark Delivered</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% endif %}
+
+<!-- Available Orders -->
+<h3 class="section-title mb-2"><i class="fa-solid fa-list"></i> Available Orders</h3>
+{% if available_orders %}
+<div style="display:flex;flex-direction:column;gap:12px">
+{% for order in available_orders %}
+<div class="card">
+    <div class="flex-between" style="flex-wrap:wrap;gap:12px">
+        <div>
+            <h4>Order #{{ order.id }} — {{ order.restaurant.name }}</h4>
+            <p class="text-muted" style="font-size:13px"><i class="fa-solid fa-location-dot"></i> {{ order.delivery_address or order.user.address or 'Address not set' }}</p>
+            <p class="text-muted" style="font-size:13px">{{ order.items|length }} items · ₹{{ "%.0f"|format(order.delivery_fee) }} earnings</p>
+        </div>
+        <form action="{{ url_for('delivery.accept_order', order_id=order.id) }}" method="POST">
+            <button type="submit" class="btn btn-sm"><i class="fa-solid fa-hand"></i> Accept</button>
+        </form>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="card text-center" style="padding:40px"><i class="fa-solid fa-inbox" style="font-size:40px;color:var(--border);display:block;margin-bottom:12px"></i><p class="text-muted">No orders available right now. Stay online!</p></div>
+{% endif %}
+
+<!-- History -->
+{% if completed_orders %}
+<h3 class="section-title mb-2" style="margin-top:30px"><i class="fa-solid fa-clock-rotate-left"></i> Recent Deliveries</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Order</th><th>Restaurant</th><th>Earned</th><th>When</th></tr></thead>
+<tbody>{% for o in completed_orders %}<tr><td>#{{ o.id }}</td><td>{{ o.restaurant.name }}</td><td>₹{{ "%.0f"|format(o.delivery_fee) }}</td><td>{{ o.created_at|timeago }}</td></tr>{% endfor %}</tbody>
+</table></div>
+{% endif %}
+{% endblock %}

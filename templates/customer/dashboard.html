@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Restaurants{% endblock %}
+{% block content %}
+<!-- Active Order Strip -->
+{% if active_orders %}
+<div style="background:linear-gradient(135deg,#fff5f2,#ffecd2);border:1px solid rgba(255,90,54,.2);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div><i class="fa-solid fa-motorcycle" style="color:var(--primary);margin-right:8px"></i><strong>{{ active_orders|length }} Active Order{{ 's' if active_orders|length > 1 }}</strong> <span class="text-muted">— {{ active_orders[0].status }}</span></div>
+    <a href="{{ url_for('customer.order_detail', order_id=active_orders[0].id) }}" class="btn btn-sm">Track Order <i class="fa-solid fa-arrow-right"></i></a>
+</div>
+{% endif %}
+
+<!-- Search -->
+<div style="position:relative;margin-bottom:20px">
+    <form class="search-bar" method="GET">
+        <i class="fa-solid fa-magnifying-glass" style="color:var(--text-muted)"></i>
+        <input type="text" name="q" id="live-search" value="{{ search_query }}" placeholder="Search restaurants or cuisines..." autocomplete="off">
+        <button type="submit" class="btn">Search</button>
+    </form>
+    <div id="search-results" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);z-index:100;max-height:300px;overflow-y:auto"></div>
+</div>
+
+<!-- Cuisine Filters -->
+<div class="filter-chips">
+    <a href="{{ url_for('customer.dashboard') }}" class="chip {{ 'active' if not current_cuisine }}">All</a>
+    {% for c in cuisines %}
+    <a href="{{ url_for('customer.dashboard', cuisine=c) }}" class="chip {{ 'active' if current_cuisine == c }}">{{ c }}</a>
+    {% endfor %}
+</div>
+
+<!-- Sort -->
+<div class="flex-between mb-3" style="flex-wrap:wrap;gap:12px">
+    <h2 class="section-title" style="margin-bottom:0">{{ restaurants|length }} Restaurants</h2>
+    <div style="display:flex;gap:8px;align-items:center">
+        <span class="text-muted" style="font-size:13px">Sort:</span>
+        <a href="{{ url_for('customer.dashboard', sort='rating', cuisine=current_cuisine, q=search_query) }}" class="chip {{ 'active' if current_sort == 'rating' }}">⭐ Rating</a>
+        <a href="{{ url_for('customer.dashboard', sort='delivery_time', cuisine=current_cuisine, q=search_query) }}" class="chip {{ 'active' if current_sort == 'delivery_time' }}">🕐 Fast</a>
+        <a href="{{ url_for('customer.dashboard', sort='price_low', cuisine=current_cuisine, q=search_query) }}" class="chip {{ 'active' if current_sort == 'price_low' }}">₹ Low</a>
+    </div>
+</div>
+
+<!-- Restaurant Grid -->
+{% if restaurants %}
+<div class="grid-auto">
+    {% for r in restaurants %}
+    <a href="{{ url_for('customer.restaurant_menu', id=r.id) }}" class="restaurant-card" style="text-decoration:none;color:inherit">
+        <img src="{{ r.image_url or 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=250&fit=crop' }}" class="card-image" alt="{{ r.name }}">
+        <div class="card-body">
+            <div class="card-title">
+                {{ r.name }}
+                {% if r.rating > 0 %}<span class="rating-badge"><i class="fa-solid fa-star"></i> {{ "%.1f"|format(r.rating) }}</span>{% endif %}
+            </div>
+            <div class="cuisine-tag">{{ r.cuisine_type or 'Multi-Cuisine' }}</div>
+            <div class="card-meta">
+                <span><i class="fa-regular fa-clock"></i> {{ r.delivery_time }}</span>
+                <span>₹{{ "%.0f"|format(r.price_for_two) }} for two</span>
+                {% if not r.is_open %}<span style="color:var(--error);font-weight:600">Closed</span>{% endif %}
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center" style="padding:40px"><i class="fa-solid fa-utensils" style="font-size:48px;color:var(--border);margin-bottom:16px;display:block"></i><p class="text-muted">No restaurants found matching your criteria.</p></div>
+{% endif %}
+{% endblock %}

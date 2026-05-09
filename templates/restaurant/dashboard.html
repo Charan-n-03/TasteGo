@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Restaurant Dashboard{% endblock %}
+{% block content %}
+<h2 class="section-title"><i class="fa-solid fa-gauge"></i> Restaurant Dashboard</h2>
+
+<!-- Stats -->
+<div class="dashboard-stats">
+    <div class="stat-card"><i class="fa-solid fa-indian-rupee-sign"></i><h3>Revenue</h3><div class="stat-value">₹{{ "%.0f"|format(total_revenue) }}</div></div>
+    <div class="stat-card"><i class="fa-solid fa-box"></i><h3>Total Orders</h3><div class="stat-value">{{ total_orders }}</div></div>
+    <div class="stat-card"><i class="fa-solid fa-clock"></i><h3>Pending</h3><div class="stat-value">{{ pending_orders }}</div></div>
+    <div class="stat-card"><i class="fa-solid fa-calendar-day"></i><h3>Today</h3><div class="stat-value">{{ today_orders }}</div></div>
+</div>
+
+<!-- Restaurants -->
+<div class="flex-between mb-2"><h3 class="section-title" style="margin-bottom:0">Your Restaurants</h3><a href="{{ url_for('restaurant.add') }}" class="btn btn-sm"><i class="fa-solid fa-plus"></i> Add Restaurant</a></div>
+{% if restaurants %}
+<div class="grid-auto" style="margin-bottom:30px">
+{% for r in restaurants %}
+<div class="card">
+    {% if r.image_url %}<img src="{{ r.image_url }}" class="card-img" alt="{{ r.name }}">{% endif %}
+    <div class="flex-between mb-1">
+        <h3 style="font-size:18px">{{ r.name }}</h3>
+        {% if r.is_approved %}<span class="status-badge status-delivered">Approved</span>{% else %}<span class="status-badge status-pending">Pending</span>{% endif %}
+    </div>
+    <p class="text-muted" style="font-size:13px">{{ r.cuisine_type or 'Multi-Cuisine' }} · {{ r.delivery_time }}</p>
+    {% if r.rating > 0 %}<p style="margin-top:4px"><span class="rating-badge"><i class="fa-solid fa-star"></i> {{ "%.1f"|format(r.rating) }}</span></p>{% endif %}
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        <a href="{{ url_for('restaurant.menu', restaurant_id=r.id) }}" class="btn btn-sm"><i class="fa-solid fa-utensils"></i> Menu</a>
+        <a href="{{ url_for('restaurant.details', id=r.id) }}" class="btn btn-sm btn-secondary"><i class="fa-solid fa-pen"></i> Edit</a>
+        <form action="{{ url_for('restaurant.toggle_open', id=r.id) }}" method="POST">
+            <button type="submit" class="btn btn-sm {{ 'btn-success' if r.is_open else 'btn-warning' }}">{{ '🟢 Open' if r.is_open else '🔴 Closed' }}</button>
+        </form>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="card text-center mb-3" style="padding:40px"><p class="text-muted mb-2">No restaurant yet</p><a href="{{ url_for('restaurant.add') }}" class="btn">Add Your Restaurant</a></div>
+{% endif %}
+
+<!-- Recent Orders -->
+{% if orders %}
+<h3 class="section-title mb-2">Recent Orders</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Order</th><th>Customer</th><th>Status</th><th>Amount</th><th>Action</th></tr></thead>
+<tbody>{% for o in orders %}<tr>
+<td>#{{ o.id }}</td><td>{{ o.user.username }}</td>
+<td><span class="status-badge status-{{ o.status.lower().replace(' ','_').replace('for_','') }}">{{ o.status }}</span></td>
+<td>₹{{ "%.0f"|format(o.total_amount) }}</td>
+<td><form action="{{ url_for('restaurant.order_update', order_id=o.id) }}" method="POST" style="display:flex;gap:6px">
+<select name="status" class="btn-sm" style="padding:4px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px">
+<option value="Pending" {{ 'selected' if o.status=='Pending' }}>Pending</option>
+<option value="Preparing" {{ 'selected' if o.status=='Preparing' }}>Preparing</option>
+<option value="Ready for Pickup" {{ 'selected' if o.status=='Ready for Pickup' }}>Ready</option>
+</select><button type="submit" class="btn btn-sm">Update</button></form></td>
+</tr>{% endfor %}</tbody>
+</table></div>
+{% endif %}
+{% endblock %}

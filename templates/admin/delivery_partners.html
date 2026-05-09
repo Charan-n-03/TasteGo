@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Delivery Partners{% endblock %}
+{% block content %}
+<div class="flex-between mb-3"><h2 class="section-title"><i class="fa-solid fa-motorcycle"></i> Delivery Partners</h2><a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost">Dashboard</a></div>
+{% if partners %}
+<div class="table-wrap"><table>
+<thead><tr><th>ID</th><th>Name</th><th>Vehicle</th><th>Deliveries</th><th>Rating</th><th>Status</th><th>Action</th></tr></thead>
+<tbody>{% for p in partners %}<tr>
+<td>{{ p.id }}</td><td>{{ p.user.username }}</td><td>{{ p.vehicle_type }}</td>
+<td>{{ p.total_deliveries }}</td><td>⭐ {{ "%.1f"|format(p.rating) }}</td>
+<td>{% if p.is_available %}<span class="status-badge status-delivered">Online</span>{% else %}<span class="status-badge status-pending">Busy</span>{% endif %}</td>
+<td><a href="{{ url_for('admin.edit_delivery_partner', p_id=p.id) }}" class="btn btn-sm">Edit</a></td>
+</tr>{% endfor %}</tbody></table></div>
+{% else %}<div class="card text-center" style="padding:40px"><p class="text-muted">No partners.</p></div>{% endif %}
+{% endblock %}

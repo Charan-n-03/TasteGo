@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="form-card">
+    <div style="text-align:center;margin-bottom:8px"><i class="fa-solid fa-fire-flame-curved" style="font-size:36px;color:var(--primary)"></i></div>
+    <h2>Welcome Back</h2>
+    <p class="text-muted text-center mb-3" style="font-size:14px">Login to your TasteGo account</p>
+    <form method="POST" action="{{url_for('auth.login')}}">
+        <div class="form-group">
+            <label for="email"><i class="fa-solid fa-envelope"></i> Email</label>
+            <input type="email" name="email" id="email" placeholder="Enter your email" required>
+        </div>
+        <div class="form-group">
+            <label for="password"><i class="fa-solid fa-lock"></i> Password</label>
+            <input type="password" name="password" id="password" placeholder="Enter your password" required>
+        </div>
+        <button type="submit" class="btn" style="width:100%;margin-top:8px"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+    </form>
+    <p style="text-align:center;margin-top:20px;font-size:14px;color:var(--text-muted)">
+        Don't have an account? <a href="{{ url_for('auth.register') }}">Sign Up</a>
+    </p>
+</div>
+{% endblock %}

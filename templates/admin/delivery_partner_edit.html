@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Edit Partner{% endblock %}
+{% block content %}
+<a href="{{ url_for('admin.delivery_partners') }}" class="btn btn-ghost mb-3"><i class="fa-solid fa-arrow-left"></i> Back</a>
+<div class="form-card" style="max-width:500px">
+    <h2>Edit Partner: {{ partner.user.username }}</h2>
+    <form action="{{ url_for('admin.edit_delivery_partner', p_id=partner.id) }}" method="POST">
+        <div class="form-group"><label>Availability</label><select name="is_available"><option value="1" {{ 'selected' if partner.is_available }}>Online</option><option value="0" {{ 'selected' if not partner.is_available }}>Offline</option></select></div>
+        <button type="submit" class="btn" style="width:100%">Update</button>
+    </form>
+</div>
+{% endblock %}

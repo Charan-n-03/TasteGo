@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Menu — {{ restaurant.name }}{% endblock %}
+{% block content %}
+<div class="flex-between mb-3">
+    <a href="{{ url_for('restaurant.dashboard') }}" class="btn btn-ghost"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+    <a href="{{ url_for('restaurant.menu_item_add', restaurant_id=restaurant.id) }}" class="btn btn-success"><i class="fa-solid fa-plus"></i> Add Item</a>
+</div>
+<h2 class="section-title">Menu: {{ restaurant.name }}</h2>
+
+{% if categories %}
+{% for cat, items in categories.items() %}
+<h4 style="margin:20px 0 10px;color:var(--text-muted)">{{ cat }} ({{ items|length }})</h4>
+<div class="table-wrap" style="margin-bottom:16px"><table>
+<thead><tr><th>Image</th><th>Name</th><th>Price</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead>
+<tbody>{% for item in items %}<tr>
+<td>{% if item.image_url %}<img src="{{ item.image_url }}" style="width:50px;height:50px;border-radius:8px;object-fit:cover">{% else %}—{% endif %}</td>
+<td><strong>{{ item.name }}</strong>{% if item.is_bestseller %} <span class="bestseller-tag">★</span>{% endif %}<br><span class="text-muted" style="font-size:12px">{{ item.description[:50] }}...</span></td>
+<td>₹{{ "%.0f"|format(item.price) }}</td>
+<td>{% if item.is_veg %}<span class="veg-dot"></span>{% else %}<span class="nonveg-dot"></span>{% endif %}</td>
+<td><form action="{{ url_for('restaurant.menu_item_toggle', item_id=item.id) }}" method="POST"><button type="submit" class="btn btn-sm {{ 'btn-success' if item.is_available else 'btn-secondary' }}" style="padding:2px 10px;font-size:11px">{{ 'Available' if item.is_available else 'Hidden' }}</button></form></td>
+<td style="display:flex;gap:6px"><a href="{{ url_for('restaurant.menu_item_edit', item_id=item.id) }}" class="btn btn-sm btn-warning" style="padding:4px 10px"><i class="fa-solid fa-pen"></i></a>
+<form action="{{ url_for('restaurant.menu_item_delete', item_id=item.id) }}" method="POST" onsubmit="return confirm('Delete?')"><button class="btn btn-sm btn-danger" style="padding:4px 10px"><i class="fa-solid fa-trash"></i></button></form></td>
+</tr>{% endfor %}</tbody></table></div>
+{% endfor %}
+{% else %}
+<div class="card text-center" style="padding:40px"><p class="text-muted">No menu items yet.</p><a href="{{ url_for('restaurant.menu_item_add', restaurant_id=restaurant.id) }}" class="btn mt-2">Add First Item</a></div>
+{% endif %}
+{% endblock %}

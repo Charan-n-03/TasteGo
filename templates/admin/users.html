@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Users{% endblock %}
+{% block content %}
+<div class="flex-between mb-3"><h2 class="section-title"><i class="fa-solid fa-users"></i> All Users</h2><a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost">Dashboard</a></div>
+<div class="table-wrap"><table>
+<thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Phone</th><th>Role</th><th>Joined</th><th>Action</th></tr></thead>
+<tbody>{% for user in users %}<tr>
+<td>{{ user.id }}</td><td><strong>{{ user.username }}</strong></td><td>{{ user.email }}</td><td>{{ user.phone or '—' }}</td>
+<td><span class="nav-role-badge">{{ user.role.name }}</span></td><td>{{ user.created_at|timeago }}</td>
+<td><form action="{{ url_for('admin.delete_user', user_id=user.id) }}" method="POST" onsubmit="return confirm('Delete?')"><button class="btn btn-sm btn-danger" style="padding:4px 10px"><i class="fa-solid fa-trash"></i></button></form></td>
+</tr>{% endfor %}</tbody></table></div>
+{% endblock %}

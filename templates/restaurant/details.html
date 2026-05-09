@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if restaurant else 'Add' }} Restaurant{% endblock %}
+{% block content %}
+<a href="{{ url_for('restaurant.dashboard') }}" class="btn btn-ghost mb-3"><i class="fa-solid fa-arrow-left"></i> Back</a>
+<div class="form-card" style="max-width:600px">
+    <h2>{{ 'Edit' if restaurant else 'Add' }} Restaurant</h2>
+    <form action="{{ url_for('restaurant.details', id=restaurant.id) if restaurant else url_for('restaurant.add') }}" method="POST">
+        <div class="form-group"><label>Restaurant Name</label><input type="text" name="name" value="{{ restaurant.name if restaurant else '' }}" required></div>
+        <div class="form-group"><label>Description</label><textarea name="description" rows="3" required>{{ restaurant.description if restaurant else '' }}</textarea></div>
+        <div class="form-group"><label>Cover Image URL</label><input type="url" name="image_url" value="{{ restaurant.image_url if restaurant else '' }}" placeholder="https://images.unsplash.com/..."></div>
+        <div class="grid-2">
+            <div class="form-group"><label>Cuisine Type</label><input type="text" name="cuisine_type" value="{{ restaurant.cuisine_type if restaurant else '' }}" placeholder="North Indian, Chinese"></div>
+            <div class="form-group"><label>Delivery Time</label><input type="text" name="delivery_time" value="{{ restaurant.delivery_time if restaurant else '30-40 mins' }}"></div>
+        </div>
+        <div class="grid-2">
+            <div class="form-group"><label>Price for Two (₹)</label><input type="number" name="price_for_two" value="{{ restaurant.price_for_two if restaurant else 400 }}"></div>
+            <div class="form-group"><label>Phone</label><input type="tel" name="phone" value="{{ restaurant.phone if restaurant else '' }}"></div>
+        </div>
+        <div class="form-group"><label>Address</label><textarea name="address" rows="2">{{ restaurant.address if restaurant else '' }}</textarea></div>
+        <button type="submit" class="btn" style="width:100%">{{ 'Update' if restaurant else 'Create' }} Restaurant</button>
+    </form>
+</div>
+{% endblock %}

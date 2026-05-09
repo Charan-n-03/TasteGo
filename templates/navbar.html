@@ -1,0 +1,48 @@
+<nav class="navbar">
+    <div class="navbar-brand">
+        <a href="{{ url_for('main.home') }}"><i class="fa-solid fa-fire-flame-curved"></i> TasteGo</a>
+    </div>
+    <div class="hamburger" onclick="this.nextElementSibling?.classList.toggle('show')">
+        <span></span><span></span><span></span>
+    </div>
+    <ul class="nav-links">
+        {% if not session.get("user_id") %}
+        <li><a href="{{ url_for('main.home') }}"><i class="fa-solid fa-house"></i> Home</a></li>
+        <li><a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-sm">Login</a></li>
+        <li><a href="{{ url_for('auth.register') }}" class="btn btn-sm">Sign Up</a></li>
+        {% endif %}
+
+        {% if session.get("role") == "ADMIN" %}
+        <li><a href="{{ url_for('admin.dashboard') }}"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+        <li><a href="{{ url_for('admin.restaurants') }}"><i class="fa-solid fa-utensils"></i> Restaurants</a></li>
+        <li><a href="{{ url_for('admin.users') }}"><i class="fa-solid fa-users"></i> Users</a></li>
+        <li><a href="{{ url_for('admin.coupons') }}"><i class="fa-solid fa-tags"></i> Coupons</a></li>
+        <li><a href="{{ url_for('admin.orders_overview') }}"><i class="fa-solid fa-box"></i> Orders</a></li>
+        <li><a href="{{ url_for('admin.profile') }}"><i class="fa-solid fa-user-shield"></i> Profile</a></li>
+        {% endif %}
+
+        {% if session.get("role") == "STAFF" %}
+        <li><a href="{{ url_for('restaurant.dashboard') }}"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+        <li><a href="{{ url_for('restaurant.orders') }}"><i class="fa-solid fa-box"></i> Orders</a></li>
+        {% endif %}
+
+        {% if session.get("role") == "PARTNER" %}
+        <li><a href="{{ url_for('delivery.dashboard') }}"><i class="fa-solid fa-motorcycle"></i> Dashboard</a></li>
+        {% endif %}
+
+        {% if session.get("role") == "CUSTOMER" %}
+        <li><a href="{{ url_for('customer.dashboard') }}"><i class="fa-solid fa-utensils"></i> Restaurants</a></li>
+        <li><a href="{{ url_for('customer.orders') }}"><i class="fa-solid fa-box"></i> Orders</a></li>
+        <li><a href="{{ url_for('customer.cart') }}" class="cart-badge">
+            <i class="fa-solid fa-bag-shopping"></i> Cart
+            {% if cart_count > 0 %}<span class="count">{{ cart_count }}</span>{% endif %}
+        </a></li>
+        <li><a href="{{ url_for('customer.profile') }}"><i class="fa-solid fa-user"></i> Profile</a></li>
+        {% endif %}
+
+        {% if session.get("user_id") %}
+        <li><span class="nav-role-badge">{{ session.get("role") }}</span></li>
+        <li><a href="{{ url_for('auth.logout') }}" class="btn btn-sm btn-secondary"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+        {% endif %}
+    </ul>
+</nav>

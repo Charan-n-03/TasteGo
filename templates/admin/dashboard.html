@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<h2 class="section-title"><i class="fa-solid fa-shield-halved"></i> Admin Control Center</h2>
+
+<div class="dashboard-stats">
+    <div class="stat-card"><i class="fa-solid fa-users"></i><h3>Users</h3><div class="stat-value">{{ users_count }}</div></div>
+    <div class="stat-card"><i class="fa-solid fa-utensils"></i><h3>Restaurants</h3><div class="stat-value">{{ restaurants_count }}</div></div>
+    <div class="stat-card"><i class="fa-solid fa-box"></i><h3>Orders</h3><div class="stat-value">{{ orders_count }}</div></div>
+    <div class="stat-card"><i class="fa-solid fa-motorcycle"></i><h3>Partners</h3><div class="stat-value">{{ partners_count }}</div></div>
+    <div class="stat-card"><i class="fa-solid fa-indian-rupee-sign"></i><h3>Revenue</h3><div class="stat-value">₹{{ "%.0f"|format(total_revenue) }}</div></div>
+    <div class="stat-card"><i class="fa-solid fa-clock"></i><h3>Pending Approvals</h3><div class="stat-value" style="color:var(--warning)">{{ pending_approvals }}</div></div>
+    <div class="stat-card"><i class="fa-solid fa-star"></i><h3>Reviews</h3><div class="stat-value">{{ reviews_count }}</div></div>
+    <div class="stat-card"><i class="fa-solid fa-tags"></i><h3>Active Coupons</h3><div class="stat-value">{{ active_coupons }}</div></div>
+</div>
+
+<!-- Order Status Breakdown -->
+<div class="grid-2" style="gap:24px;margin-bottom:30px;align-items:start">
+<div class="card">
+    <h4 class="mb-2"><i class="fa-solid fa-chart-pie" style="color:var(--primary)"></i> Order Status</h4>
+    {% for status, count in status_counts.items() %}
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span class="status-badge status-{{ status.lower().replace(' ','_').replace('for_','') }}">{{ status }}</span>
+        <strong>{{ count }}</strong>
+    </div>
+    {% endfor %}
+</div>
+<div class="card">
+    <h4 class="mb-2"><i class="fa-solid fa-bolt" style="color:var(--warning)"></i> Quick Actions</h4>
+    <div style="display:flex;flex-direction:column;gap:10px">
+        <a href="{{ url_for('admin.restaurants') }}" class="btn btn-outline" style="justify-content:flex-start"><i class="fa-solid fa-utensils"></i> Manage Restaurants {% if pending_approvals > 0 %}<span class="count" style="background:var(--warning);color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:8px">{{ pending_approvals }}</span>{% endif %}</a>
+        <a href="{{ url_for('admin.orders_overview') }}" class="btn btn-outline" style="justify-content:flex-start"><i class="fa-solid fa-box"></i> All Orders</a>
+        <a href="{{ url_for('admin.coupons') }}" class="btn btn-outline" style="justify-content:flex-start"><i class="fa-solid fa-tags"></i> Coupons</a>
+        <a href="{{ url_for('admin.reviews') }}" class="btn btn-outline" style="justify-content:flex-start"><i class="fa-solid fa-star"></i> Reviews</a>
+        <a href="{{ url_for('admin.delivery_partners') }}" class="btn btn-outline" style="justify-content:flex-start"><i class="fa-solid fa-motorcycle"></i> Delivery Partners</a>
+    </div>
+    <form action="{{ url_for('admin.reset_db') }}" method="POST" onsubmit="return confirm('RESET DATABASE? All data will be lost!')" style="margin-top:16px">
+        <button class="btn btn-danger btn-sm" style="width:100%"><i class="fa-solid fa-triangle-exclamation"></i> Reset Database</button>
+    </form>
+</div>
+</div>
+
+<!-- Recent Orders -->
+{% if recent_orders %}
+<h3 class="section-title mb-2">Recent Orders</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Order</th><th>Customer</th><th>Restaurant</th><th>Status</th><th>Amount</th><th>When</th></tr></thead>
+<tbody>{% for o in recent_orders %}<tr>
+<td>#{{ o.id }}</td><td>{{ o.user.username }}</td><td>{{ o.restaurant.name }}</td>
+<td><span class="status-badge status-{{ o.status.lower().replace(' ','_').replace('for_','') }}">{{ o.status }}</span></td>
+<td>₹{{ "%.0f"|format(o.total_amount) }}</td><td>{{ o.created_at|timeago }}</td>
+</tr>{% endfor %}</tbody></table></div>
+{% endif %}
+{% endblock %}

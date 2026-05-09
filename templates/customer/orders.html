@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Orders{% endblock %}
+{% block content %}
+<div class="flex-between mb-3">
+    <h2 class="section-title"><i class="fa-solid fa-box"></i> Your Orders</h2>
+    <a href="{{ url_for('customer.dashboard') }}" class="btn btn-ghost"><i class="fa-solid fa-arrow-left"></i> Restaurants</a>
+</div>
+{% if orders %}
+<div style="display:flex;flex-direction:column;gap:16px">
+{% for order in orders %}
+<div class="card" style="padding:0;overflow:hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:var(--surface-alt);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px">
+        <div><strong>Order #{{ order.id }}</strong> <span class="text-muted">· {{ order.created_at.strftime('%d %b %Y, %I:%M %p') }}</span></div>
+        <span class="status-badge status-{{ order.status.lower().replace(' ','_').replace('for_','') }}">
+            {% if order.status == 'Pending' %}<i class="fa-solid fa-clock"></i>
+            {% elif order.status == 'Preparing' %}<i class="fa-solid fa-fire-burner"></i>
+            {% elif order.status == 'Ready for Pickup' %}<i class="fa-solid fa-box"></i>
+            {% elif order.status == 'Out for Delivery' %}<i class="fa-solid fa-motorcycle"></i>
+            {% elif order.status == 'Delivered' %}<i class="fa-solid fa-circle-check"></i>
+            {% endif %} {{ order.status }}
+        </span>
+    </div>
+    <div style="padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+        <div>
+            <p style="font-weight:600">{{ order.restaurant.name }}</p>
+            <p class="text-muted" style="font-size:13px">{{ order.items|length }} item{{ 's' if order.items|length > 1 }} · {{ order.payment_method }}</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+            <strong style="font-size:18px">₹{{ "%.0f"|format(order.total_amount + order.delivery_fee - order.discount) }}</strong>
+            <a href="{{ url_for('customer.order_detail', order_id=order.id) }}" class="btn btn-sm">View Details</a>
+            {% if order.status == 'Out for Delivery' %}
+            <a href="{{ url_for('customer.track_order', order_id=order.id) }}" class="btn btn-sm btn-success"><i class="fa-solid fa-location-dot"></i> Track</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="text-center" style="padding:60px"><i class="fa-solid fa-box-open" style="font-size:64px;color:var(--border);display:block;margin-bottom:16px"></i><h3>No orders yet</h3><p class="text-muted mb-3">Your order history will appear here</p><a href="{{ url_for('customer.dashboard') }}" class="btn">Browse Restaurants</a></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Coupons{% endblock %}
+{% block content %}
+<div class="flex-between mb-3"><h2 class="section-title"><i class="fa-solid fa-tags"></i> Coupons</h2>
+<div style="display:flex;gap:8px"><a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost">Dashboard</a><a href="{{ url_for('admin.add_coupon') }}" class="btn"><i class="fa-solid fa-plus"></i> Create Coupon</a></div></div>
+{% if coupons %}
+<div class="table-wrap"><table>
+<thead><tr><th>Code</th><th>Discount</th><th>Max Off</th><th>Min Order</th><th>Status</th><th>Actions</th></tr></thead>
+<tbody>{% for c in coupons %}<tr>
+<td><strong style="color:var(--primary)">{{ c.code }}</strong><br><span class="text-muted" style="font-size:12px">{{ c.description or '' }}</span></td>
+<td>{{ c.discount_percent|int }}%</td><td>₹{{ c.max_discount|int }}</td><td>₹{{ c.min_order|int }}</td>
+<td>{% if c.is_active %}<span class="status-badge status-delivered">Active</span>{% else %}<span class="status-badge status-pending">Inactive</span>{% endif %}</td>
+<td style="display:flex;gap:6px"><a href="{{ url_for('admin.edit_coupon', c_id=c.id) }}" class="btn btn-sm btn-warning" style="padding:4px 10px"><i class="fa-solid fa-pen"></i></a>
+<form action="{{ url_for('admin.delete_coupon', c_id=c.id) }}" method="POST" onsubmit="return confirm('Delete?')"><button class="btn btn-sm btn-danger" style="padding:4px 10px"><i class="fa-solid fa-trash"></i></button></form></td>
+</tr>{% endfor %}</tbody></table></div>
+{% else %}<div class="card text-center" style="padding:40px"><p class="text-muted">No coupons yet.</p></div>{% endif %}
+{% endblock %}

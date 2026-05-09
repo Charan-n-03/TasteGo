@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}All Orders{% endblock %}
+{% block content %}
+<div class="flex-between mb-3"><h2 class="section-title"><i class="fa-solid fa-box"></i> All Orders</h2><a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost">Dashboard</a></div>
+<div class="filter-chips mb-2">
+    <a href="{{ url_for('admin.orders_overview') }}" class="chip {{ 'active' if not current_status }}">All</a>
+    {% for s in ['Pending','Preparing','Ready for Pickup','Out for Delivery','Delivered'] %}
+    <a href="{{ url_for('admin.orders_overview', status=s) }}" class="chip {{ 'active' if current_status == s }}">{{ s }}</a>
+    {% endfor %}
+</div>
+{% if orders %}
+<div class="table-wrap"><table>
+<thead><tr><th>Order</th><th>Customer</th><th>Restaurant</th><th>Status</th><th>Payment</th><th>Amount</th><th>When</th></tr></thead>
+<tbody>{% for o in orders %}<tr>
+<td>#{{ o.id }}</td><td>{{ o.user.username }}</td><td>{{ o.restaurant.name }}</td>
+<td><span class="status-badge status-{{ o.status.lower().replace(' ','_').replace('for_','') }}">{{ o.status }}</span></td>
+<td>{{ o.payment_method }}</td><td>₹{{ "%.0f"|format(o.total_amount) }}</td><td>{{ o.created_at|timeago }}</td>
+</tr>{% endfor %}</tbody></table></div>
+{% else %}<div class="card text-center" style="padding:40px"><p class="text-muted">No orders found.</p></div>{% endif %}
+{% endblock %}

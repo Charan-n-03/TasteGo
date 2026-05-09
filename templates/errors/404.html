@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Page Not Found{% endblock %}
+{% block content %}
+<div class="error-page">
+    <div class="error-icon">🍕</div>
+    <h1>404</h1>
+    <h2>Oops! This page got delivered to the wrong address</h2>
+    <p>The page you're looking for doesn't exist or has been moved.</p>
+    <a href="{{ url_for('main.home') }}" class="btn btn-primary">
+        <i class="fa-solid fa-house"></i> Back to Home
+    </a>
+</div>
+{% endblock %}

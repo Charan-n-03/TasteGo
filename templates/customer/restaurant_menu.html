@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{{ restaurant.name }}{% endblock %}
+{% block hero %}
+<div style="max-width:1280px;margin:0 auto;padding:0 20px">
+<section class="hero-section" style="background:linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.45)),url('{{ restaurant.image_url or 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&h=400&fit=crop' }}') center/cover;color:#fff;border-radius:0 0 var(--radius-xl) var(--radius-xl);margin-top:0">
+    <h1 style="color:#fff">{{ restaurant.name }}</h1>
+    <p class="lead" style="color:rgba(255,255,255,.85)">{{ restaurant.cuisine_type or 'Multi-Cuisine' }} · {{ restaurant.delivery_time }} · ₹{{ "%.0f"|format(restaurant.price_for_two) }} for two</p>
+    <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-top:12px">
+        {% if restaurant.rating > 0 %}<span class="rating-badge" style="font-size:15px;padding:4px 14px"><i class="fa-solid fa-star"></i> {{ "%.1f"|format(restaurant.rating) }} ({{ restaurant.total_ratings }})</span>{% endif %}
+        {% if not restaurant.is_open %}<span class="status-badge status-pending">Currently Closed</span>{% endif %}
+    </div>
+</section>
+</div>
+{% endblock %}
+{% block content %}
+<div class="flex-between mb-3">
+    <a href="{{ url_for('customer.dashboard') }}" class="btn btn-ghost"><i class="fa-solid fa-arrow-left"></i> Back</a>
+    <a href="{{ url_for('customer.cart') }}" class="btn btn-success cart-badge"><i class="fa-solid fa-bag-shopping"></i> View Cart {% if cart_count > 0 %}<span class="count">{{ cart_count }}</span>{% endif %}</a>
+</div>
+
+<!-- Menu by Category -->
+{% for cat, items in categories.items() %}
+<h3 style="margin:24px 0 12px;font-size:18px"><i class="fa-solid fa-utensils" style="color:var(--primary);font-size:14px"></i> {{ cat }} <span class="text-muted" style="font-size:13px;font-weight:400">({{ items|length }})</span></h3>
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+    {% for item in items %}
+    <div class="menu-card">
+        <div class="menu-info">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+                {% if item.is_veg %}<span class="veg-dot"></span>{% else %}<span class="nonveg-dot"></span>{% endif %}
+                {% if item.is_bestseller %}<span class="bestseller-tag"><i class="fa-solid fa-award"></i> Bestseller</span>{% endif %}
+            </div>
+            <h4>{{ item.name }}</h4>
+            <p>{{ item.description }}</p>
+            <span class="menu-price">₹{{ "%.0f"|format(item.price) }}</span>
+            <form action="{{ url_for('customer.add_to_cart', restaurant_id=restaurant.id, item_id=item.id) }}" method="POST" style="margin-top:8px">
+                <button type="submit" class="btn btn-sm btn-outline">+ Add</button>
+            </form>
+        </div>
+        {% if item.image_url %}
+        <img src="{{ item.image_url }}" class="menu-img" alt="{{ item.name }}">
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endfor %}
+
+{% if not categories %}
+<div class="text-center" style="padding:40px"><p class="text-muted">No menu items available right now.</p></div>
+{% endif %}
+
+<!-- Reviews -->
+{% if reviews %}
+<h3 style="margin:30px 0 16px" class="section-title">Reviews</h3>
+{% for r in reviews %}
+<div class="card mb-2">
+    <div class="flex-between"><strong>{{ r.user.username }}</strong><span class="rating-badge"><i class="fa-solid fa-star"></i> {{ r.rating }}</span></div>
+    {% if r.comment %}<p class="text-muted" style="margin-top:6px;font-size:14px">{{ r.comment }}</p>{% endif %}
+    <p class="text-muted" style="font-size:12px;margin-top:4px">{{ r.created_at|timeago }}</p>
+</div>
+{% endfor %}
+{% endif %}
+{% endblock %}

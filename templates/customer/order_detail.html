@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Order #{{ order.id }}{% endblock %}
+{% block content %}
+<div class="flex-between mb-3">
+    <a href="{{ url_for('customer.orders') }}" class="btn btn-ghost"><i class="fa-solid fa-arrow-left"></i> All Orders</a>
+    {% if order.status == 'Out for Delivery' %}
+    <a href="{{ url_for('customer.track_order', order_id=order.id) }}" class="btn btn-success"><i class="fa-solid fa-location-dot"></i> Track Live</a>
+    {% endif %}
+</div>
+
+<!-- Status Timeline -->
+<div id="order-status-live" data-order-id="{{ order.id }}">
+<div class="card mb-3">
+    <div class="flex-between mb-2"><h3>Order #{{ order.id }}</h3><span id="status-badge" class="status-badge status-{{ order.status.lower().replace(' ','_').replace('for_','') }}">{{ order.status }}</span></div>
+    {% set steps = ['Pending','Preparing','Ready for Pickup','Out for Delivery','Delivered'] %}
+    {% set current = steps.index(order.status) if order.status in steps else 0 %}
+    <div class="order-timeline">
+        {% for step in steps %}
+        <div class="timeline-step {{ 'completed' if loop.index0 < current else ('active' if loop.index0 == current else '') }}">
+            <div class="step-icon">
+                {% if loop.index0 < current %}<i class="fa-solid fa-check"></i>
+                {% elif step == 'Pending' %}<i class="fa-solid fa-clock"></i>
+                {% elif step == 'Preparing' %}<i class="fa-solid fa-fire-burner"></i>
+                {% elif step == 'Ready for Pickup' %}<i class="fa-solid fa-box"></i>
+                {% elif step == 'Out for Delivery' %}<i class="fa-solid fa-motorcycle"></i>
+                {% elif step == 'Delivered' %}<i class="fa-solid fa-circle-check"></i>{% endif %}
+            </div>
+            <span class="step-label">{{ step }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    <p class="text-muted text-center" style="margin-top:12px;font-size:13px">
+        {% if order.status != 'Delivered' %}Auto-updating · Estimated: {{ order.estimated_delivery }}{% else %}Delivered · {{ order.created_at|timeago }}{% endif %}
+    </p>
+</div>
+</div>
+
+<div class="grid-2" style="gap:24px;align-items:start">
+<div>
+    <div class="card">
+        <h4 class="mb-2"><i class="fa-solid fa-utensils" style="color:var(--primary)"></i> Order Items</h4>
+        {% for item in order.items %}
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);align-items:center">
+            <div style="display:flex;align-items:center;gap:8px">
+                {% if item.menu_item.is_veg %}<span class="veg-dot"></span>{% else %}<span class="nonveg-dot"></span>{% endif %}
+                <span>{{ item.menu_item.name }} × {{ item.quantity }}</span>
+            </div>
+            <strong>₹{{ "%.0f"|format(item.price_at_time * item.quantity) }}</strong>
+        </div>
+        {% endfor %}
+        <div class="bill-row" style="margin-top:8px"><span>Item Total</span><span>₹{{ "%.2f"|format(order.total_amount) }}</span></div>
+        <div class="bill-row"><span>Delivery Fee</span><span>{% if order.delivery_fee == 0 %}<span class="free">FREE</span>{% else %}₹{{ "%.2f"|format(order.delivery_fee) }}{% endif %}</span></div>
+        {% if order.discount > 0 %}<div class="bill-row"><span>Discount</span><span class="discount">-₹{{ "%.2f"|format(order.discount) }}</span></div>{% endif %}
+        <div class="bill-row total"><span>Total Paid</span><span>₹{{ "%.2f"|format(order.total_amount + order.delivery_fee - order.discount) }}</span></div>
+    </div>
+</div>
+<div>
+    <div class="card mb-2">
+        <h4 class="mb-1"><i class="fa-solid fa-info-circle" style="color:var(--primary)"></i> Details</h4>
+        <p class="text-muted" style="font-size:14px"><strong>Restaurant:</strong> {{ order.restaurant.name }}</p>
+        <p class="text-muted" style="font-size:14px"><strong>Payment:</strong> {{ order.payment_method }}</p>
+        <p class="text-muted" style="font-size:14px"><strong>Address:</strong> {{ order.delivery_address or 'N/A' }}</p>
+        <p class="text-muted" style="font-size:14px"><strong>Date:</strong> {{ order.created_at.strftime('%d %b %Y, %I:%M %p') }}</p>
+        {% if order.special_instructions %}<p class="text-muted" style="font-size:14px"><strong>Note:</strong> {{ order.special_instructions }}</p>{% endif %}
+    </div>
+
+    <!-- Delivery Partner -->
+    <div class="card mb-2" id="partner-info" style="{{ 'display:none' if not order.delivery_partner }}">
+        <h4 class="mb-1"><i class="fa-solid fa-motorcycle" style="color:var(--primary)"></i> Delivery Partner</h4>
+        {% if order.delivery_partner %}
+        <p><strong id="partner-name">{{ order.delivery_partner.user.username }}</strong></p>
+        <p class="text-muted" style="font-size:14px">{{ order.delivery_partner.vehicle_type }} · ⭐ {{ "%.1f"|format(order.delivery_partner.rating) }}</p>
+        {% endif %}
+    </div>
+
+    <!-- Review (only if delivered and not reviewed) -->
+    {% if order.status == 'Delivered' and not order.review %}
+    <div class="card">
+        <h4 class="mb-2"><i class="fa-solid fa-star" style="color:var(--warning)"></i> Rate Your Order</h4>
+        <form action="{{ url_for('customer.submit_review', order_id=order.id) }}" method="POST">
+            <div class="form-group">
+                <label>Rating</label>
+                <select name="rating"><option value="5">⭐⭐⭐⭐⭐ Excellent</option><option value="4">⭐⭐⭐⭐ Good</option><option value="3">⭐⭐⭐ Average</option><option value="2">⭐⭐ Poor</option><option value="1">⭐ Terrible</option></select>
+            </div>
+            <div class="form-group"><label>Comment</label><textarea name="comment" rows="2" placeholder="How was the food?"></textarea></div>
+            <button type="submit" class="btn btn-sm"><i class="fa-solid fa-paper-plane"></i> Submit Review</button>
+        </form>
+    </div>
+    {% elif order.review %}
+    <div class="card"><p><strong>Your Review:</strong> <span class="rating-badge"><i class="fa-solid fa-star"></i> {{ order.review.rating }}</span></p>{% if order.review.comment %}<p class="text-muted mt-1" style="font-size:14px">{{ order.review.comment }}</p>{% endif %}</div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

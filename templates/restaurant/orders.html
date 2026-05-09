@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Orders{% endblock %}
+{% block content %}
+<div class="flex-between mb-3"><h2 class="section-title"><i class="fa-solid fa-box"></i> All Orders</h2><a href="{{ url_for('restaurant.dashboard') }}" class="btn btn-ghost">Dashboard</a></div>
+{% if orders %}
+<div class="table-wrap"><table>
+<thead><tr><th>Order</th><th>Customer</th><th>Date</th><th>Status</th><th>Amount</th><th>Action</th></tr></thead>
+<tbody>{% for o in orders %}<tr>
+<td>#{{ o.id }}</td><td>{{ o.user.username }}</td><td>{{ o.created_at.strftime('%d %b, %H:%M') }}</td>
+<td><span class="status-badge status-{{ o.status.lower().replace(' ','_').replace('for_','') }}">{{ o.status }}</span></td>
+<td>₹{{ "%.0f"|format(o.total_amount) }}</td>
+<td>{% if o.status not in ['Delivered','Out for Delivery'] %}<form action="{{ url_for('restaurant.order_update', order_id=o.id) }}" method="POST" style="display:flex;gap:4px">
+<select name="status" style="padding:4px;border:1px solid var(--border);border-radius:6px;font-size:12px"><option value="Pending" {{ 'selected' if o.status=='Pending' }}>Pending</option><option value="Preparing" {{ 'selected' if o.status=='Preparing' }}>Preparing</option><option value="Ready for Pickup" {{ 'selected' if o.status=='Ready for Pickup' }}>Ready</option></select>
+<button class="btn btn-sm">Go</button></form>{% else %}—{% endif %}</td>
+</tr>{% endfor %}</tbody></table></div>
+{% else %}<div class="card text-center" style="padding:40px"><p class="text-muted">No orders yet.</p></div>{% endif %}
+{% endblock %}

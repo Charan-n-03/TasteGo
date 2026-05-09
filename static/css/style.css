@@ -1,0 +1,85 @@
+/* General Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    color: #0F1419; /* Twitter-like dark text */
+    background-color: #FFFFFF;
+}
+
+/* Container */
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #EFF3F4; /* Light grey border */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-brand a {
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: #0F1419;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+}
+
+.nav-links li {
+    margin-left: 20px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #536471;
+    font-weight: 500;
+}
+
+.nav-links a:hover {
+    text-decoration: underline;
+}
+
+/* Hero Section */
+.hero {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.hero h1 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.hero p {
+    color: #536471;
+    margin-bottom: 10px;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 50px;
+    border-top: 1px solid #EFF3F4;
+    color: #536471;
+    font-size: 0.875rem;
+}

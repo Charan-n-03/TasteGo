@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Manage Restaurants{% endblock %}
+{% block content %}
+<div class="flex-between mb-3"><h2 class="section-title"><i class="fa-solid fa-utensils"></i> Restaurants</h2>
+<div style="display:flex;gap:8px"><a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost">Dashboard</a><a href="{{ url_for('admin.add_restaurant') }}" class="btn"><i class="fa-solid fa-plus"></i> Add</a></div></div>
+{% if restaurants %}
+<div class="table-wrap"><table>
+<thead><tr><th>ID</th><th>Image</th><th>Name</th><th>Cuisine</th><th>Owner</th><th>Rating</th><th>Status</th><th>Actions</th></tr></thead>
+<tbody>{% for r in restaurants %}<tr>
+<td>{{ r.id }}</td>
+<td>{% if r.image_url %}<img src="{{ r.image_url }}" style="width:50px;height:40px;border-radius:6px;object-fit:cover">{% else %}—{% endif %}</td>
+<td><strong>{{ r.name }}</strong></td><td>{{ r.cuisine_type or '—' }}</td><td>{{ r.owner.username }}</td>
+<td>{% if r.rating > 0 %}<span class="rating-badge"><i class="fa-solid fa-star"></i> {{ "%.1f"|format(r.rating) }}</span>{% else %}—{% endif %}</td>
+<td>{% if r.is_approved %}<span class="status-badge status-delivered">Approved</span>{% else %}<span class="status-badge status-pending">Pending</span>{% endif %}</td>
+<td style="display:flex;gap:6px;align-items:center">
+<form action="{{ url_for('admin.approve_restaurant', r_id=r.id) }}" method="POST"><button class="btn btn-sm {{ 'btn-warning' if r.is_approved else 'btn-success' }}" style="padding:4px 10px">{{ 'Revoke' if r.is_approved else 'Approve' }}</button></form>
+<form action="{{ url_for('admin.delete_restaurant', r_id=r.id) }}" method="POST" onsubmit="return confirm('Delete?')"><button class="btn btn-sm btn-danger" style="padding:4px 10px"><i class="fa-solid fa-trash"></i></button></form>
+</td></tr>{% endfor %}</tbody></table></div>
+{% else %}<p class="text-muted">No restaurants.</p>{% endif %}
+{% endblock %}

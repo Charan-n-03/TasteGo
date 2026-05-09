@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Reviews{% endblock %}
+{% block content %}
+<div class="flex-between mb-3"><h2 class="section-title"><i class="fa-solid fa-star"></i> Reviews</h2><a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost">Dashboard</a></div>
+{% if reviews %}
+<div class="table-wrap"><table>
+<thead><tr><th>User</th><th>Restaurant</th><th>Rating</th><th>Comment</th><th>Date</th><th>Action</th></tr></thead>
+<tbody>{% for r in reviews %}<tr>
+<td>{{ r.user.username }}</td><td>{{ r.restaurant.name }}</td>
+<td><span class="rating-badge"><i class="fa-solid fa-star"></i> {{ r.rating }}</span></td>
+<td>{{ r.comment[:60] if r.comment else '—' }}{{ '...' if r.comment and r.comment|length > 60 }}</td>
+<td>{{ r.created_at|timeago }}</td>
+<td><form action="{{ url_for('admin.delete_review', r_id=r.id) }}" method="POST" onsubmit="return confirm('Delete?')"><button class="btn btn-sm btn-danger" style="padding:4px 10px"><i class="fa-solid fa-trash"></i></button></form></td>
+</tr>{% endfor %}</tbody></table></div>
+{% else %}<div class="card text-center" style="padding:40px"><p class="text-muted">No reviews yet.</p></div>{% endif %}
+{% endblock %}
