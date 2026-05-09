@@ -2,7 +2,7 @@
     <div class="navbar-brand">
         <a href="{{ url_for('main.home') }}"><i class="fa-solid fa-fire-flame-curved"></i> TasteGo</a>
     </div>
-    <div class="hamburger" onclick="this.nextElementSibling?.classList.toggle('show')">
+    <div class="hamburger">
         <span></span><span></span><span></span>
     </div>
     <ul class="nav-links">
@@ -44,5 +44,6 @@
         <li><span class="nav-role-badge">{{ session.get("role") }}</span></li>
         <li><a href="{{ url_for('auth.logout') }}" class="btn btn-sm btn-secondary"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
         {% endif %}
+        <li><button id="theme-toggle" class="btn btn-ghost btn-sm" aria-label="Toggle Dark Mode" style="padding: 6px 10px;"><i class="fa-solid fa-moon"></i></button></li>
     </ul>
 </nav>
