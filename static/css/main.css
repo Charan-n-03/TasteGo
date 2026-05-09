@@ -283,6 +283,10 @@ tr:hover td{background:var(--surface-alt)}
 [data-theme="dark"] .landing-hero {
   background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e1b4b 100%);
 }
+[data-theme="dark"] .stats-banner,
+[data-theme="dark"] .footer {
+  background: var(--surface-alt);
+}
 [data-theme="dark"] th {
   background: var(--surface-alt);
 }
