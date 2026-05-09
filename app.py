@@ -4,13 +4,18 @@ from extensions import db
 from datetime import datetime, timedelta
 import os
 
-app = Flask(__name__)
+app = Flask(__name__,
+            template_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates'),
+            static_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static'))
 app.config.from_object(Config)
 db.init_app(app)
 app.secret_key = app.config["SECRET_KEY"]
 
-with app.app_context():
-    db.create_all()
+try:
+    with app.app_context():
+        db.create_all()
+except Exception as e:
+    print(f"DB create_all warning: {e}")
 
 from routes import auth_bp, main_bp, admin_bp, customer_bp, restaurant_bp, delivery_bp
 
