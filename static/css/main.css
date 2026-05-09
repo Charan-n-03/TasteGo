@@ -14,6 +14,10 @@
 --primary:#FF5A36;--primary-hover:#E04321;--primary-light:rgba(255,90,54,.2);
 --secondary:#F9FAFB;--bg:#0F172A;--surface:#1E293B;--surface-alt:#334155;
 --text:#F8FAFC;--text-muted:#94A3B8;--border:#334155;
+--success:#10B981;--success-bg:rgba(16,185,129,.15);
+--error:#EF4444;--error-bg:rgba(239,68,68,.15);
+--warning:#F59E0B;--warning-bg:rgba(245,158,11,.15);
+--info:#3B82F6;--info-bg:rgba(59,130,246,.15);
 --shadow-sm:0 1px 3px rgba(0,0,0,.3);--shadow-md:0 4px 12px rgba(0,0,0,.4);
 --shadow-lg:0 12px 28px rgba(0,0,0,.5);
 }

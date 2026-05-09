@@ -3,8 +3,8 @@
 {% block content %}
 <!-- Active Order Strip -->
 {% if active_orders %}
-<div style="background:linear-gradient(135deg,#fff5f2,#ffecd2);border:1px solid rgba(255,90,54,.2);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-    <div><i class="fa-solid fa-motorcycle" style="color:var(--primary);margin-right:8px"></i><strong>{{ active_orders|length }} Active Order{{ 's' if active_orders|length > 1 }}</strong> <span class="text-muted">— {{ active_orders[0].status }}</span></div>
+<div style="background:linear-gradient(135deg,#fff5f2,#ffecd2);border:1px solid rgba(255,90,54,.2);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;color:#1C2433;">
+    <div><i class="fa-solid fa-motorcycle" style="color:var(--primary);margin-right:8px"></i><strong>{{ active_orders|length }} Active Order{{ 's' if active_orders|length > 1 }}</strong> <span style="color:#637381">— {{ active_orders[0].status }}</span></div>
     <a href="{{ url_for('customer.order_detail', order_id=active_orders[0].id) }}" class="btn btn-sm">Track Order <i class="fa-solid fa-arrow-right"></i></a>
 </div>
 {% endif %}
