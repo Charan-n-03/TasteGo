@@ -1,4 +1,4 @@
-# TasteGo Project Documentation
+# [TasteGo Project Documentation](https://tastego-sigma.vercel.app/)
 
 This document serves as a comprehensive technical explanation of the TasteGo application, covering its database schema, backend architecture, frontend UI, and core business logic.
 
